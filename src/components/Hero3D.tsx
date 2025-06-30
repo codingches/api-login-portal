@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
 import { Suspense } from "react";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 const AnimatedSphere = () => {
   return (
@@ -53,12 +54,22 @@ const Scene3D = () => {
   );
 };
 
+const BackgroundFallback = () => {
+  return (
+    <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-pink-900/20 to-purple-900/20">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
+    </div>
+  );
+};
+
 export const Hero3D = () => {
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
-      {/* 3D Background */}
+      {/* 3D Background with Error Boundary */}
       <div className="absolute inset-0 z-0">
-        <Scene3D />
+        <ErrorBoundary fallback={<BackgroundFallback />}>
+          <Scene3D />
+        </ErrorBoundary>
       </div>
 
       {/* Gradient Overlay */}
