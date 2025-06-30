@@ -47,7 +47,7 @@ serve(async (req) => {
 
     logStep("Bank details received", { routingNumber });
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripe = new Stripe("sk_test_51RfghWQucmTpJKpfIEeJqydzwC74rg9er04Nj2eJp4ythP82Hx6pdaFN9XsVhCUKPPFVj49UGKGLwMlz3kV5rixp00KRRbGeQH", {
       apiVersion: "2023-10-16",
     });
 

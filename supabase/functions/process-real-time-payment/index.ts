@@ -27,6 +27,16 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header provided");
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError) throw new Error(`Authentication error: ${userError.message}`);
+    
+    const user = userData.user;
+    if (!user) throw new Error("User not authenticated");
+
     const { bookingId, amount, paymentMethodId } = await req.json();
     
     if (!bookingId || !amount || !paymentMethodId) {
@@ -46,20 +56,30 @@ serve(async (req) => {
       throw new Error("Booking not found");
     }
 
-    logStep("Booking found", { barberId: booking.barber_id });
+    // Verify user owns this booking
+    if (booking.user_id !== user.id) {
+      throw new Error("Unauthorized - booking does not belong to user");
+    }
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    logStep("Booking found and verified", { barberId: booking.barber_id, userId: user.id });
+
+    const stripe = new Stripe("sk_test_51RfghWQucmTpJKpfIEeJqydzwC74rg9er04Nj2eJp4ythP82Hx6pdaFN9XsVhCUKPPFVj49UGKGLwMlz3kV5rixp00KRRbGeQH", {
       apiVersion: "2023-10-16",
     });
 
     // Create payment intent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100, // Convert to cents
+      amount: Math.round(amount * 100), // Convert to cents
       currency: 'usd',
       payment_method: paymentMethodId,
       confirmation_method: 'automatic',
       confirm: true,
       return_url: `${req.headers.get("origin")}/dashboard`,
+      metadata: {
+        booking_id: bookingId,
+        user_id: user.id,
+        barber_id: booking.barber_id,
+      },
     });
 
     logStep("Payment intent created", { 
@@ -71,7 +91,7 @@ serve(async (req) => {
     const { data: payment, error: paymentError } = await supabaseClient
       .from('real_time_payments')
       .insert({
-        user_id: booking.user_id,
+        user_id: user.id,
         barber_id: booking.barber_id,
         booking_id: bookingId,
         amount: amount,
