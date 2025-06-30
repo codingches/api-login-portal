@@ -8,13 +8,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
 export const ProfileSettings = () => {
-  const { user } = useAuth();
-  const { userProfile, refetchProfile } = useUserProfile();
+  const { user, signOut } = useAuth();
+  const { profile, refetchProfile } = useUserProfile();
 
   const handleImageUpdate = (url: string | null) => {
     // The ProfilePictureUpload component handles the database update,
     // so we just need to refresh the profile data
     refetchProfile();
+  };
+
+  const handleAccountDeleted = () => {
+    // Sign out the user after account deletion
+    signOut();
   };
 
   if (!user) {
@@ -35,7 +40,7 @@ export const ProfileSettings = () => {
         </CardHeader>
         <CardContent>
           <ProfilePictureUpload
-            currentImageUrl={userProfile?.profile_picture_url}
+            currentImageUrl={profile?.profile_picture_url}
             onImageUpdate={handleImageUpdate}
             userType="user"
             userId={user.id}
@@ -50,7 +55,7 @@ export const ProfileSettings = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <DeleteAccountDialog />
+          <DeleteAccountDialog onAccountDeleted={handleAccountDeleted} />
         </CardContent>
       </Card>
     </div>
