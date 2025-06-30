@@ -1,13 +1,13 @@
-
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, Star, User, Phone, Mail, MapPin, CreditCard } from "lucide-react";
+import { Calendar, Clock, Star, User, Phone, Mail, MapPin, CreditCard, Trophy } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { RewardsCard } from "@/components/RewardsCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -111,6 +111,9 @@ export const UserDashboard = () => {
             <TabsTrigger value="overview" className="data-[state=active]:bg-green-500/20">
               Overview
             </TabsTrigger>
+            <TabsTrigger value="rewards" className="data-[state=active]:bg-green-500/20">
+              Rewards
+            </TabsTrigger>
             <TabsTrigger value="bookings" className="data-[state=active]:bg-green-500/20">
               My Bookings
             </TabsTrigger>
@@ -209,6 +212,10 @@ export const UserDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="rewards">
+            <RewardsCard />
           </TabsContent>
 
           <TabsContent value="bookings">

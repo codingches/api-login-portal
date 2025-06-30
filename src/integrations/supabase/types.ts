@@ -49,42 +49,57 @@ export type Database = {
       }
       barber_profiles: {
         Row: {
+          address: string | null
           business_name: string
           created_at: string
           id: string
+          is_verified: boolean | null
+          latitude: number | null
           location: string
+          longitude: number | null
           phone: string
           pricing: string
           specialty: string
           status: string
           updated_at: string
           user_id: string | null
+          verification_paid_at: string | null
           x_handle: string | null
         }
         Insert: {
+          address?: string | null
           business_name: string
           created_at?: string
           id?: string
+          is_verified?: boolean | null
+          latitude?: number | null
           location: string
+          longitude?: number | null
           phone: string
           pricing: string
           specialty: string
           status?: string
           updated_at?: string
           user_id?: string | null
+          verification_paid_at?: string | null
           x_handle?: string | null
         }
         Update: {
+          address?: string | null
           business_name?: string
           created_at?: string
           id?: string
+          is_verified?: boolean | null
+          latitude?: number | null
           location?: string
+          longitude?: number | null
           phone?: string
           pricing?: string
           specialty?: string
           status?: string
           updated_at?: string
           user_id?: string | null
+          verification_paid_at?: string | null
           x_handle?: string | null
         }
         Relationships: []
@@ -95,8 +110,11 @@ export type Database = {
           created_at: string
           description: string | null
           duration_minutes: number
+          home_service_available: boolean | null
+          home_service_price: number | null
           id: string
           is_active: boolean
+          onsite_price: number | null
           price: number
           service_name: string
         }
@@ -105,8 +123,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           duration_minutes: number
+          home_service_available?: boolean | null
+          home_service_price?: number | null
           id?: string
           is_active?: boolean
+          onsite_price?: number | null
           price: number
           service_name: string
         }
@@ -115,8 +136,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           duration_minutes?: number
+          home_service_available?: boolean | null
+          home_service_price?: number | null
           id?: string
           is_active?: boolean
+          onsite_price?: number | null
           price?: number
           service_name?: string
         }
@@ -173,6 +197,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      client_rewards: {
+        Row: {
+          created_at: string | null
+          current_tier: string | null
+          discount_percentage: number | null
+          id: string
+          points_earned: number | null
+          total_bookings: number | null
+          total_spent: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_tier?: string | null
+          discount_percentage?: number | null
+          id?: string
+          points_earned?: number | null
+          total_bookings?: number | null
+          total_spent?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_tier?: string | null
+          discount_percentage?: number | null
+          id?: string
+          points_earned?: number | null
+          total_bookings?: number | null
+          total_spent?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -382,6 +442,44 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      verification_payments: {
+        Row: {
+          amount: number
+          barber_id: string | null
+          created_at: string | null
+          id: string
+          status: string | null
+          stripe_payment_intent_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number
+          barber_id?: string | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          barber_id?: string | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_payments_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
