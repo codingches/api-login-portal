@@ -5,62 +5,112 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { X, Calendar, Clock, User, Phone, Mail, CheckCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { X, Calendar, Clock, Scissors, Terminal } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+
+interface Barber {
+  id: string;
+  business_name: string;
+  location: string;
+  specialty: string;
+  pricing: string;
+  x_handle: string | null;
+  phone: string;
+  status: string;
+}
 
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  barber: any;
+  barber: Barber | null;
 }
 
 export const BookingModal = ({ isOpen, onClose, barber }: BookingModalProps) => {
-  const [step, setStep] = useState(1);
-  const [bookingData, setBookingData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    date: '',
-    time: '',
-    service: ''
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    bookingDate: '',
+    bookingTime: '',
+    serviceType: ''
   });
+  const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
 
-  const [isBooking, setIsBooking] = useState(false);
-  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const timeSlots = [
+    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
+  ];
+
+  const serviceTypes = [
+    'Haircut', 'Beard Trim', 'Haircut + Beard', 'Styling', 'Consultation'
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsBooking(true);
     
-    // Simulate real-time booking
-    setTimeout(() => {
-      setIsBooking(false);
-      setBookingConfirmed(true);
-    }, 2000);
+    if (!isAuthenticated) {
+      toast({
+        title: "[AUTH_REQUIRED]",
+        description: "Please login to book an appointment",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!barber) return;
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .insert({
+          user_id: user?.id,
+          barber_id: barber.id,
+          booking_date: formData.bookingDate,
+          booking_time: formData.bookingTime,
+          service_type: formData.serviceType,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "[BOOKING_SUCCESS]",
+        description: `Appointment booked with ${barber.business_name}!`,
+      });
+
+      setFormData({ bookingDate: '', bookingTime: '', serviceType: '' });
+      onClose();
+    } catch (error: any) {
+      toast({
+        title: "[BOOKING_ERROR]",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const resetModal = () => {
-    setStep(1);
-    setBookingConfirmed(false);
-    setBookingData({
-      name: '',
-      phone: '',
-      email: '',
-      date: '',
-      time: '',
-      service: ''
-    });
+  const resetForm = () => {
+    setFormData({ bookingDate: '', bookingTime: '', serviceType: '' });
   };
 
   const handleClose = () => {
-    resetModal();
+    resetForm();
     onClose();
   };
 
-  if (!barber) return null;
+  // Get minimum date (today)
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && barber && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -73,21 +123,16 @@ export const BookingModal = ({ isOpen, onClose, barber }: BookingModalProps) => 
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-2xl"
+            className="w-full max-w-md"
           >
             <Card className="bg-black border-green-500 shadow-2xl shadow-green-500/20">
               <CardHeader className="border-b border-green-500/30">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl">{barber.avatar}</div>
-                    <div>
-                      <CardTitle className="text-green-400 font-mono">
-                        BOOKING: {barber.name}
-                      </CardTitle>
-                      <p className="text-green-300 text-sm font-mono">
-                        {barber.location} • {barber.specialty}
-                      </p>
-                    </div>
+                    <Terminal className="h-6 w-6 text-green-400" />
+                    <CardTitle className="text-green-400 font-mono">
+                      [BOOKING_SYSTEM]
+                    </CardTitle>
                   </div>
                   <Button
                     variant="ghost"
@@ -98,225 +143,93 @@ export const BookingModal = ({ isOpen, onClose, barber }: BookingModalProps) => 
                     <X className="h-5 w-5" />
                   </Button>
                 </div>
+                <div className="text-green-300 font-mono text-sm">
+                  Booking with: {barber.business_name}
+                </div>
               </CardHeader>
 
               <CardContent className="p-6">
-                {!bookingConfirmed ? (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Step indicators */}
-                    <div className="flex items-center justify-center gap-4 mb-6">
-                      {[1, 2, 3].map((num) => (
-                        <div
-                          key={num}
-                          className={`w-8 h-8 rounded-full flex items-center justify-center font-mono text-sm border-2 ${
-                            step >= num
-                              ? 'bg-green-500 border-green-500 text-black'
-                              : 'border-green-500/50 text-green-500'
-                          }`}
-                        >
-                          {num}
-                        </div>
-                      ))}
-                    </div>
-
-                    {step === 1 && (
-                      <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="space-y-4"
-                      >
-                        <div className="text-center mb-4">
-                          <h3 className="text-green-400 font-mono text-lg mb-2">[PERSONAL_INFO]</h3>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="name" className="text-green-400 font-mono">FULL_NAME</Label>
-                          <Input
-                            id="name"
-                            value={bookingData.name}
-                            onChange={(e) => setBookingData({...bookingData, name: e.target.value})}
-                            className="bg-black/50 border-green-500/50 text-white font-mono"
-                            required
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="phone" className="text-green-400 font-mono">PHONE_NUMBER</Label>
-                          <Input
-                            id="phone"
-                            value={bookingData.phone}
-                            onChange={(e) => setBookingData({...bookingData, phone: e.target.value})}
-                            className="bg-black/50 border-green-500/50 text-white font-mono"
-                            required
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="email" className="text-green-400 font-mono">EMAIL_ADDRESS</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={bookingData.email}
-                            onChange={(e) => setBookingData({...bookingData, email: e.target.value})}
-                            className="bg-black/50 border-green-500/50 text-white font-mono"
-                            required
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {step === 2 && (
-                      <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="space-y-4"
-                      >
-                        <div className="text-center mb-4">
-                          <h3 className="text-green-400 font-mono text-lg mb-2">[SCHEDULE_APPOINTMENT]</h3>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="date" className="text-green-400 font-mono">PREFERRED_DATE</Label>
-                          <Input
-                            id="date"
-                            type="date"
-                            value={bookingData.date}
-                            onChange={(e) => setBookingData({...bookingData, date: e.target.value})}
-                            className="bg-black/50 border-green-500/50 text-white font-mono"
-                            required
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="time" className="text-green-400 font-mono">PREFERRED_TIME</Label>
-                          <select
-                            id="time"
-                            value={bookingData.time}
-                            onChange={(e) => setBookingData({...bookingData, time: e.target.value})}
-                            className="w-full p-2 bg-black/50 border border-green-500/50 text-white font-mono rounded"
-                            required
-                          >
-                            <option value="">SELECT_TIME</option>
-                            <option value="09:00">09:00 AM</option>
-                            <option value="10:00">10:00 AM</option>
-                            <option value="11:00">11:00 AM</option>
-                            <option value="14:00">02:00 PM</option>
-                            <option value="15:00">03:00 PM</option>
-                            <option value="16:00">04:00 PM</option>
-                          </select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="service" className="text-green-400 font-mono">SERVICE_TYPE</Label>
-                          <select
-                            id="service"
-                            value={bookingData.service}
-                            onChange={(e) => setBookingData({...bookingData, service: e.target.value})}
-                            className="w-full p-2 bg-black/50 border border-green-500/50 text-white font-mono rounded"
-                            required
-                          >
-                            <option value="">SELECT_SERVICE</option>
-                            <option value="haircut">HAIRCUT ({barber.price})</option>
-                            <option value="beard">BEARD_TRIM (+$15)</option>
-                            <option value="combo">COMBO_DEAL (+$20)</option>
-                          </select>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {step === 3 && (
-                      <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="space-y-4"
-                      >
-                        <div className="text-center mb-4">
-                          <h3 className="text-green-400 font-mono text-lg mb-2">[CONFIRM_BOOKING]</h3>
-                        </div>
-                        
-                        <div className="bg-green-500/10 border border-green-500/30 p-4 rounded font-mono">
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <div className="text-green-400">BARBER:</div>
-                              <div className="text-white">{barber.name}</div>
-                            </div>
-                            <div>
-                              <div className="text-green-400">CLIENT:</div>
-                              <div className="text-white">{bookingData.name}</div>
-                            </div>
-                            <div>
-                              <div className="text-green-400">DATE:</div>
-                              <div className="text-white">{bookingData.date}</div>
-                            </div>
-                            <div>
-                              <div className="text-green-400">TIME:</div>
-                              <div className="text-white">{bookingData.time}</div>
-                            </div>
-                            <div>
-                              <div className="text-green-400">SERVICE:</div>
-                              <div className="text-white">{bookingData.service.toUpperCase()}</div>
-                            </div>
-                            <div>
-                              <div className="text-green-400">PRICE:</div>
-                              <div className="text-white">{barber.price}</div>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    <div className="flex justify-between pt-6">
-                      {step > 1 && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setStep(step - 1)}
-                          className="border-green-500 text-green-400 font-mono"
-                        >
-                          [BACK]
-                        </Button>
-                      )}
-                      
-                      {step < 3 ? (
-                        <Button
-                          type="button"
-                          onClick={() => setStep(step + 1)}
-                          className="bg-green-500 hover:bg-green-600 text-black font-mono ml-auto"
-                        >
-                          [NEXT]
-                        </Button>
-                      ) : (
-                        <Button
-                          type="submit"
-                          disabled={isBooking}
-                          className="bg-green-500 hover:bg-green-600 text-black font-mono ml-auto"
-                        >
-                          {isBooking ? '[PROCESSING...]' : '[CONFIRM_BOOKING]'}
-                        </Button>
-                      )}
-                    </div>
-                  </form>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-8"
-                  >
-                    <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold text-green-400 font-mono mb-2">
-                      [BOOKING_CONFIRMED]
-                    </h3>
-                    <p className="text-green-300 font-mono mb-6">
-                      Your appointment with {barber.name} has been confirmed!<br/>
-                      You will receive a confirmation message shortly.
+                {!isAuthenticated ? (
+                  <div className="text-center py-8">
+                    <p className="text-green-400 font-mono mb-4">
+                      [AUTHENTICATION_REQUIRED]
                     </p>
+                    <p className="text-green-300/80 font-mono text-sm">
+                      Please login to book an appointment
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="bookingDate" className="text-green-400 font-mono">DATE</Label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-3 h-4 w-4 text-green-500" />
+                        <Input
+                          id="bookingDate"
+                          type="date"
+                          min={today}
+                          value={formData.bookingDate}
+                          onChange={(e) => setFormData({...formData, bookingDate: e.target.value})}
+                          className="bg-black/50 border-green-500/50 text-white font-mono pl-10"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="bookingTime" className="text-green-400 font-mono">TIME</Label>
+                      <Select
+                        value={formData.bookingTime}
+                        onValueChange={(value) => setFormData({...formData, bookingTime: value})}
+                        required
+                      >
+                        <SelectTrigger className="bg-black/50 border-green-500/50 text-white font-mono">
+                          <div className="flex items-center">
+                            <Clock className="mr-2 h-4 w-4 text-green-500" />
+                            <SelectValue placeholder="Select time" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="bg-black border-green-500">
+                          {timeSlots.map((time) => (
+                            <SelectItem key={time} value={time} className="text-green-400 font-mono">
+                              {time}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="serviceType" className="text-green-400 font-mono">SERVICE</Label>
+                      <Select
+                        value={formData.serviceType}
+                        onValueChange={(value) => setFormData({...formData, serviceType: value})}
+                        required
+                      >
+                        <SelectTrigger className="bg-black/50 border-green-500/50 text-white font-mono">
+                          <div className="flex items-center">
+                            <Scissors className="mr-2 h-4 w-4 text-green-500" />
+                            <SelectValue placeholder="Select service" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="bg-black border-green-500">
+                          {serviceTypes.map((service) => (
+                            <SelectItem key={service} value={service} className="text-green-400 font-mono">
+                              {service}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                     <Button
-                      onClick={handleClose}
-                      className="bg-green-500 hover:bg-green-600 text-black font-mono"
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-green-500 hover:bg-green-600 text-black font-mono font-bold"
                     >
-                      [CLOSE]
+                      {loading ? '[PROCESSING...]' : '[CONFIRM_BOOKING]'}
                     </Button>
-                  </motion.div>
+                  </form>
                 )}
               </CardContent>
             </Card>

@@ -9,7 +9,92 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      barber_profiles: {
+        Row: {
+          business_name: string
+          created_at: string
+          id: string
+          location: string
+          phone: string
+          pricing: string
+          specialty: string
+          status: string
+          updated_at: string
+          user_id: string | null
+          x_handle: string | null
+        }
+        Insert: {
+          business_name: string
+          created_at?: string
+          id?: string
+          location: string
+          phone: string
+          pricing: string
+          specialty: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          x_handle?: string | null
+        }
+        Update: {
+          business_name?: string
+          created_at?: string
+          id?: string
+          location?: string
+          phone?: string
+          pricing?: string
+          specialty?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          x_handle?: string | null
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          barber_id: string | null
+          booking_date: string
+          booking_time: string
+          created_at: string
+          id: string
+          service_type: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          barber_id?: string | null
+          booking_date: string
+          booking_time: string
+          created_at?: string
+          id?: string
+          service_type: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          barber_id?: string | null
+          booking_date?: string
+          booking_time?: string
+          created_at?: string
+          id?: string
+          service_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

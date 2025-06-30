@@ -1,110 +1,80 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Scissors, Zap, Globe } from "lucide-react";
+import { Terminal, Zap, Users, Clock } from "lucide-react";
 
 export const HeroSection = () => {
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
-      {/* Animated grid background */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-green-500/5" />
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `linear-gradient(90deg, rgba(34,197,94,0.1) 1px, transparent 1px),
-                             linear-gradient(rgba(34,197,94,0.1) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
-          }}
-        />
-      </div>
-
-      <div className="container mx-auto px-6 text-center relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
+    <section className="min-h-screen pt-20 pb-16 px-6">
+      <div className="container mx-auto">
+        <div className="text-center mb-16">
           <motion.div
-            className="mb-6"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring" }}
-          >
-            <div className="inline-block p-4 border-2 border-green-500 rounded-lg bg-green-500/10">
-              <Scissors className="h-16 w-16 text-green-400" />
-            </div>
-          </motion.div>
-
-          <motion.h1 
-            className="text-6xl md:text-8xl font-bold mb-6 font-mono"
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.3 }}
-          >
-            <span className="text-green-400">ZIDON</span>
-            <br />
-            <span className="text-white text-4xl md:text-6xl">NETWORK_INITIALIZED</span>
-          </motion.h1>
-
-          <motion.div
-            className="border border-green-500/50 p-4 bg-black/50 rounded-lg mb-8 max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.5 }}
+            transition={{ duration: 0.8 }}
+            className="mb-8"
           >
-            <p className="text-lg md:text-xl text-green-300 font-mono leading-relaxed">
-              &gt; CONNECTING BARBERS GLOBALLY...<br/>
-              &gt; REAL-TIME BOOKING SYSTEM ACTIVE<br/>
-              &gt; NETWORK STATUS: <span className="text-green-400 font-bold">ONLINE</span><br/>
-              &gt; USERS_CONNECTED: <span className="text-green-400">2,847</span>
+            <h1 className="text-6xl md:text-8xl font-bold text-green-400 mb-6 tracking-wider">
+              ZIDON_SYSTEM
+            </h1>
+            <p className="text-xl md:text-2xl text-green-300 font-mono mb-8">
+              [NEXT_GENERATION_BARBER_NETWORK]
+            </p>
+            <p className="text-lg text-green-400/80 font-mono max-w-2xl mx-auto">
+              Connect with elite barbers in real-time. Advanced booking algorithms. 
+              Secure payment processing. Welcome to the future of grooming.
             </p>
           </motion.div>
 
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.8 }}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12"
           >
-            <Button 
-              size="lg" 
-              className="bg-green-500 hover:bg-green-600 text-black text-lg px-8 py-4 h-auto font-mono font-bold group border-2 border-green-400"
-            >
-              <Zap className="mr-2 group-hover:rotate-12 transition-transform" />
-              BOOK_NOW
-            </Button>
+            <div className="border border-green-500/30 bg-black/50 p-6 rounded-lg">
+              <Zap className="h-12 w-12 text-green-400 mx-auto mb-4" />
+              <h3 className="text-green-400 font-mono text-lg mb-2">[REAL_TIME]</h3>
+              <p className="text-green-300/80 font-mono text-sm">
+                Instant booking confirmation and live availability updates
+              </p>
+            </div>
             
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="border-green-500 text-green-400 hover:bg-green-500/20 text-lg px-8 py-4 h-auto font-mono"
-            >
-              <Globe className="mr-2" />
-              EXPLORE_NETWORK
-            </Button>
+            <div className="border border-green-500/30 bg-black/50 p-6 rounded-lg">
+              <Users className="h-12 w-12 text-green-400 mx-auto mb-4" />
+              <h3 className="text-green-400 font-mono text-lg mb-2">[VERIFIED_NETWORK]</h3>
+              <p className="text-green-300/80 font-mono text-sm">
+                Curated barbers with verified skills and customer reviews
+              </p>
+            </div>
+            
+            <div className="border border-green-500/30 bg-black/50 p-6 rounded-lg">
+              <Clock className="h-12 w-12 text-green-400 mx-auto mb-4" />
+              <h3 className="text-green-400 font-mono text-lg mb-2">[24/7_ACCESS]</h3>
+              <p className="text-green-300/80 font-mono text-sm">
+                Book appointments anytime, anywhere in the network
+              </p>
+            </div>
           </motion.div>
 
           <motion.div
-            className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="space-y-4"
           >
-            <div className="border border-green-500/30 p-4 bg-black/30 rounded">
-              <div className="text-green-400 font-mono text-sm mb-2">[FEATURE_01]</div>
-              <div className="text-white">Real-time availability tracking</div>
-            </div>
-            <div className="border border-green-500/30 p-4 bg-black/30 rounded">
-              <div className="text-green-400 font-mono text-sm mb-2">[FEATURE_02]</div>
-              <div className="text-white">Global barber network access</div>
-            </div>
-            <div className="border border-green-500/30 p-4 bg-black/30 rounded">
-              <div className="text-green-400 font-mono text-sm mb-2">[FEATURE_03]</div>
-              <div className="text-white">Instant booking confirmation</div>
+            <Button
+              size="lg"
+              className="bg-green-500 hover:bg-green-600 text-black font-mono text-lg px-8 py-4 mr-4"
+            >
+              <Terminal className="mr-2 h-5 w-5" />
+              ACCESS_NETWORK
+            </Button>
+            <div className="text-green-400/60 font-mono text-sm">
+              [SYSTEM_STATUS: ONLINE] | [ACTIVE_BARBERS: LOADING...]
             </div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
