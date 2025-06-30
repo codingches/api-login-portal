@@ -50,6 +50,9 @@ export type Database = {
       barber_profiles: {
         Row: {
           address: string | null
+          bank_account_number: string | null
+          bank_account_verified: boolean | null
+          bank_routing_number: string | null
           business_name: string
           created_at: string
           id: string
@@ -61,6 +64,7 @@ export type Database = {
           pricing: string
           specialty: string
           status: string
+          stripe_account_id: string | null
           updated_at: string
           user_id: string | null
           verification_paid_at: string | null
@@ -68,6 +72,9 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          bank_account_number?: string | null
+          bank_account_verified?: boolean | null
+          bank_routing_number?: string | null
           business_name: string
           created_at?: string
           id?: string
@@ -79,6 +86,7 @@ export type Database = {
           pricing: string
           specialty: string
           status?: string
+          stripe_account_id?: string | null
           updated_at?: string
           user_id?: string | null
           verification_paid_at?: string | null
@@ -86,6 +94,9 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          bank_account_number?: string | null
+          bank_account_verified?: boolean | null
+          bank_routing_number?: string | null
           business_name?: string
           created_at?: string
           id?: string
@@ -97,6 +108,7 @@ export type Database = {
           pricing?: string
           specialty?: string
           status?: string
+          stripe_account_id?: string | null
           updated_at?: string
           user_id?: string | null
           verification_paid_at?: string | null
@@ -147,6 +159,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "barber_services_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      barber_suggestions: {
+        Row: {
+          barber_id: string | null
+          completed: boolean | null
+          created_at: string
+          description: string
+          id: string
+          priority: number | null
+          suggestion_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          barber_id?: string | null
+          completed?: boolean | null
+          created_at?: string
+          description: string
+          id?: string
+          priority?: number | null
+          suggestion_type: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          barber_id?: string | null
+          completed?: boolean | null
+          created_at?: string
+          description?: string
+          id?: string
+          priority?: number | null
+          suggestion_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_suggestions_barber_id_fkey"
             columns: ["barber_id"]
             isOneToOne: false
             referencedRelation: "barber_profiles"
@@ -352,6 +408,66 @@ export type Database = {
           },
           {
             foreignKeyName: "payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      real_time_payments: {
+        Row: {
+          amount: number
+          barber_id: string | null
+          booking_id: string | null
+          created_at: string
+          currency: string | null
+          id: string
+          payment_method: string | null
+          processed_at: string | null
+          status: string | null
+          stripe_payment_intent_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          barber_id?: string | null
+          booking_id?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_method?: string | null
+          processed_at?: string | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          barber_id?: string | null
+          booking_id?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_method?: string | null
+          processed_at?: string | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "real_time_payments_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "real_time_payments_booking_id_fkey"
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"

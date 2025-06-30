@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useBarberData } from "@/hooks/useBarberData";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { Link } from "react-router-dom";
+import { BankConnectionForm } from "@/components/BankConnectionForm";
+import { ClientSuggestions } from "@/components/ClientSuggestions";
+import { RealTimePayments } from "@/components/RealTimePayments";
 
 export const BarberDashboard = () => {
   const { user, signOut } = useAuth();
@@ -81,6 +83,12 @@ export const BarberDashboard = () => {
           <TabsList className="bg-black border border-green-500/30">
             <TabsTrigger value="overview" className="data-[state=active]:bg-green-500/20">
               Overview
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="data-[state=active]:bg-green-500/20">
+              Payments
+            </TabsTrigger>
+            <TabsTrigger value="suggestions" className="data-[state=active]:bg-green-500/20">
+              Suggestions
             </TabsTrigger>
             <TabsTrigger value="services" className="data-[state=active]:bg-green-500/20">
               Services
@@ -210,6 +218,20 @@ export const BarberDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="payments">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <BankConnectionForm 
+                barberProfile={barberProfile}
+                onSuccess={() => window.location.reload()}
+              />
+              <RealTimePayments barberId={barberProfile.id} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="suggestions">
+            <ClientSuggestions barberId={barberProfile.id} />
           </TabsContent>
 
           <TabsContent value="services">
