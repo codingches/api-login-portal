@@ -1,11 +1,14 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Scissors, Terminal, User, LogOut } from "lucide-react";
+import { Scissors, Terminal, User, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { AuthModal } from "./AuthModal";
 import { BarberRegistrationModal } from "./BarberRegistrationModal";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +17,24 @@ export const Navigation = () => {
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
   
   const { user, loading, signOut, isAuthenticated } = useAuth();
+
+  // Check if user is a barber
+  const { data: barberProfile } = useQuery({
+    queryKey: ['barber-profile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from('barber_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   const handleLogin = () => {
     setAuthModalMode('login');
@@ -26,6 +47,12 @@ export const Navigation = () => {
   };
 
   const handleBarberRegistration = () => {
+    if (!isAuthenticated) {
+      // If not authenticated, show login modal first
+      setAuthModalMode('register');
+      setIsAuthModalOpen(true);
+      return;
+    }
     setIsBarberModalOpen(true);
   };
 
@@ -60,10 +87,12 @@ export const Navigation = () => {
               className="flex items-center space-x-3"
               whileHover={{ scale: 1.05 }}
             >
-              <Terminal className="h-8 w-8 text-green-400" />
-              <span className="text-2xl font-bold text-green-400 tracking-wider">
-                ZIDON_SYSTEM
-              </span>
+              <Link to="/" className="flex items-center space-x-3">
+                <Terminal className="h-8 w-8 text-green-400" />
+                <span className="text-2xl font-bold text-green-400 tracking-wider">
+                  ZIDON_SYSTEM
+                </span>
+              </Link>
             </motion.div>
             
             <div className="hidden md:flex items-center space-x-6">
@@ -82,10 +111,32 @@ export const Navigation = () => {
                   <span className="text-green-400 font-mono">
                     [USER: {user?.user_metadata?.full_name || user?.email}]
                   </span>
+                  
+                  <Link to="/dashboard">
+                    <Button 
+                      variant="outline" 
+                      className="border-green-500 text-green-400 hover:bg-green-500/20 font-mono"
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      DASHBOARD
+                    </Button>
+                  </Link>
+
+                  {!barberProfile && (
+                    <Button 
+                      onClick={handleBarberRegistration}
+                      variant="outline" 
+                      className="border-green-500 text-green-400 hover:bg-green-500 hover:text-black font-mono"
+                    >
+                      <Scissors className="mr-2 h-4 w-4" />
+                      REGISTER_BARBER
+                    </Button>
+                  )}
+
                   <Button 
                     onClick={signOut}
                     variant="outline" 
-                    className="border-green-500 text-green-400 hover:bg-green-500/20 font-mono"
+                    className="border-red-500 text-red-400 hover:bg-red-500/20 font-mono"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     LOGOUT
@@ -139,6 +190,22 @@ export const Navigation = () => {
                     <div className="text-green-400 font-mono text-sm">
                       [USER: {user?.user_metadata?.full_name || user?.email}]
                     </div>
+                    <Link to="/dashboard">
+                      <Button 
+                        className="w-full bg-green-500 hover:bg-green-600 text-black font-mono mb-2"
+                      >
+                        DASHBOARD
+                      </Button>
+                    </Link>
+                    {!barberProfile && (
+                      <Button 
+                        onClick={handleBarberRegistration}
+                        variant="outline" 
+                        className="w-full border-green-500 text-green-400 font-mono mb-2"
+                      >
+                        REGISTER_BARBER
+                      </Button>
+                    )}
                     <Button 
                       onClick={signOut}
                       className="w-full bg-red-500 hover:bg-red-600 text-white font-mono"
