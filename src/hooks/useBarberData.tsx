@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -26,6 +27,9 @@ export interface BarberService {
   price: number;
   duration_minutes: number;
   is_active: boolean;
+  onsite_price: number | null;
+  home_service_price: number | null;
+  home_service_available: boolean | null;
   created_at: string;
 }
 
