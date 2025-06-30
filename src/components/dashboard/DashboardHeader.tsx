@@ -1,9 +1,11 @@
 
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { VerificationBadge } from "@/components/VerificationBadge";
-import { Link } from "react-router-dom";
-import { Home } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
+import { ProfilePictureUpload } from "@/components/ProfilePictureUpload";
+import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
+import { LogOut, User, Settings } from "lucide-react";
+import { useState } from "react";
 
 interface DashboardHeaderProps {
   barberProfile: any;
@@ -11,46 +13,83 @@ interface DashboardHeaderProps {
 }
 
 export const DashboardHeader = ({ barberProfile, onSignOut }: DashboardHeaderProps) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mb-8"
-    >
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold text-green-400">
-            [BARBER_DASHBOARD]
-          </h1>
-          <VerificationBadge 
-            barberId={barberProfile.id}
-            isVerified={barberProfile.is_verified || false}
-            isOwner={true}
-          />
-        </div>
-        <div className="flex items-center gap-3">
-          <Link to="/">
-            <Button 
-              variant="outline" 
-              className="border-green-500 text-green-400 hover:bg-green-500/20"
-            >
-              <Home className="mr-2 h-4 w-4" />
-              HOME
-            </Button>
-          </Link>
-          <Button 
-            onClick={onSignOut}
-            variant="outline" 
-            className="border-red-500 text-red-400 hover:bg-red-500/20"
-          >
-            LOGOUT
-          </Button>
-        </div>
-      </div>
+  const [showProfileUpload, setShowProfileUpload] = useState(false);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(barberProfile?.profile_picture_url);
 
-      <div className="text-green-300 mb-8">
-        {barberProfile.business_name} - {barberProfile.location}
-      </div>
-    </motion.div>
+  const handleAccountDeleted = () => {
+    onSignOut();
+    window.location.href = '/';
+  };
+
+  return (
+    <Card className="bg-black border-green-500/30 mb-6">
+      <CardContent className="p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Avatar className="h-16 w-16 border-2 border-green-500/30 cursor-pointer"
+                      onClick={() => setShowProfileUpload(!showProfileUpload)}>
+                <AvatarImage src={profilePictureUrl || undefined} alt="Profile" />
+                <AvatarFallback className="bg-black text-green-400 text-xl">
+                  {barberProfile?.business_name?.[0] || 'B'}
+                </AvatarFallback>
+              </Avatar>
+              {showProfileUpload && (
+                <div className="absolute top-20 left-0 z-10 bg-black border border-green-500/30 rounded-lg p-4 min-w-[300px]">
+                  <ProfilePictureUpload
+                    currentImageUrl={profilePictureUrl}
+                    onImageUpdate={setProfilePictureUrl}
+                    userType="barber"
+                    userId={barberProfile?.user_id}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowProfileUpload(false)}
+                    className="mt-3 w-full border-green-500/30 text-green-400"
+                  >
+                    Close
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-green-400">
+                {barberProfile?.business_name || 'Barber Dashboard'}
+              </h1>
+              <p className="text-green-300/80">
+                {barberProfile?.location} • {barberProfile?.specialty}
+              </p>
+              <p className="text-green-300/60 text-sm">
+                Status: {barberProfile?.status?.replace('_', ' ').toUpperCase()}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowProfileUpload(!showProfileUpload)}
+              className="border-green-500/30 text-green-400"
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Profile
+            </Button>
+            
+            <DeleteAccountDialog onAccountDeleted={handleAccountDeleted} />
+            
+            <Button
+              variant="outline"
+              onClick={onSignOut}
+              className="border-green-500/30 text-green-400"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

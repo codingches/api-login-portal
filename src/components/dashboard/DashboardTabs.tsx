@@ -3,19 +3,32 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardOverview } from "./DashboardOverview";
 import { DashboardPayments } from "./DashboardPayments";
 import { ClientSuggestions } from "@/components/ClientSuggestions";
+import { ServicesTab } from "./ServicesTab";
+import { AvailabilityTab } from "./AvailabilityTab";
+import { BookingsTab } from "./BookingsTab";
 
 interface DashboardTabsProps {
   barberProfile: any;
   bookings: any[];
   services: any[];
+  availability: any[];
   onPaymentSuccess: () => void;
+  onAddService: (service: any) => Promise<boolean>;
+  onUpdateService: (serviceId: string, updates: any) => Promise<boolean>;
+  onUpdateAvailability: (dayOfWeek: number, startTime: string, endTime: string, isAvailable: boolean) => Promise<boolean>;
+  onRefreshBookings: () => void;
 }
 
 export const DashboardTabs = ({ 
   barberProfile, 
   bookings, 
-  services, 
-  onPaymentSuccess 
+  services,
+  availability,
+  onPaymentSuccess,
+  onAddService,
+  onUpdateService,
+  onUpdateAvailability,
+  onRefreshBookings
 }: DashboardTabsProps) => {
   return (
     <Tabs defaultValue="overview" className="space-y-6">
@@ -60,15 +73,26 @@ export const DashboardTabs = ({
       </TabsContent>
 
       <TabsContent value="services">
-        <div>Services Content</div>
+        <ServicesTab
+          services={services}
+          onAddService={onAddService}
+          onUpdateService={onUpdateService}
+          barberId={barberProfile.id}
+        />
       </TabsContent>
 
       <TabsContent value="bookings">
-        <div>Bookings Content</div>
+        <BookingsTab
+          bookings={bookings}
+          onRefreshBookings={onRefreshBookings}
+        />
       </TabsContent>
 
       <TabsContent value="availability">
-        <div>Availability Content</div>
+        <AvailabilityTab
+          availability={availability}
+          onUpdateAvailability={onUpdateAvailability}
+        />
       </TabsContent>
     </Tabs>
   );

@@ -62,6 +62,7 @@ export type Database = {
           longitude: number | null
           phone: string
           pricing: string
+          profile_picture_url: string | null
           specialty: string
           status: string
           stripe_account_id: string | null
@@ -84,6 +85,7 @@ export type Database = {
           longitude?: number | null
           phone: string
           pricing: string
+          profile_picture_url?: string | null
           specialty: string
           status?: string
           stripe_account_id?: string | null
@@ -106,6 +108,7 @@ export type Database = {
           longitude?: number | null
           phone?: string
           pricing?: string
+          profile_picture_url?: string | null
           specialty?: string
           status?: string
           stripe_account_id?: string | null
@@ -422,6 +425,8 @@ export type Database = {
           booking_id: string | null
           created_at: string
           currency: string | null
+          escrow_released_at: string | null
+          escrow_status: string | null
           id: string
           payment_method: string | null
           processed_at: string | null
@@ -436,6 +441,8 @@ export type Database = {
           booking_id?: string | null
           created_at?: string
           currency?: string | null
+          escrow_released_at?: string | null
+          escrow_status?: string | null
           id?: string
           payment_method?: string | null
           processed_at?: string | null
@@ -450,6 +457,8 @@ export type Database = {
           booking_id?: string | null
           created_at?: string
           currency?: string | null
+          escrow_released_at?: string | null
+          escrow_status?: string | null
           id?: string
           payment_method?: string | null
           processed_at?: string | null
@@ -534,6 +543,7 @@ export type Database = {
           id: string
           phone: string | null
           preferences: Json | null
+          profile_picture_url: string | null
           updated_at: string
           user_id: string | null
         }
@@ -544,6 +554,7 @@ export type Database = {
           id?: string
           phone?: string | null
           preferences?: Json | null
+          profile_picture_url?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -554,6 +565,7 @@ export type Database = {
           id?: string
           phone?: string | null
           preferences?: Json | null
+          profile_picture_url?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -602,7 +614,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_user_account: {
+        Args: { user_id_to_delete: string }
+        Returns: boolean
+      }
+      release_escrow_payment: {
+        Args: { payment_id: string; admin_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

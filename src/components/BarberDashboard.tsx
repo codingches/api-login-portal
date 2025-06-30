@@ -6,7 +6,17 @@ import { DashboardTabs } from "./dashboard/DashboardTabs";
 
 export const BarberDashboard = () => {
   const { user, signOut } = useAuth();
-  const { barberProfile, services, availability, bookings, loading } = useBarberData();
+  const { 
+    barberProfile, 
+    services, 
+    availability, 
+    bookings, 
+    loading,
+    addService,
+    updateService,
+    setAvailabilityForDay,
+    refetchData
+  } = useBarberData();
 
   if (loading) {
     return (
@@ -40,7 +50,12 @@ export const BarberDashboard = () => {
           barberProfile={barberProfile}
           bookings={bookings}
           services={services}
+          availability={availability}
           onPaymentSuccess={handlePaymentSuccess}
+          onAddService={addService}
+          onUpdateService={updateService}
+          onUpdateAvailability={setAvailabilityForDay}
+          onRefreshBookings={refetchData}
         />
       </div>
     </div>
