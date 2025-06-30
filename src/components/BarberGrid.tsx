@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MapPin, Scissors, Phone, DollarSign, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +16,7 @@ interface Barber {
   x_handle: string | null;
   phone: string;
   status: string;
+  profile_picture_url: string | null;
 }
 
 interface BarberGridProps {
@@ -98,10 +100,18 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
             >
               <Card className="bg-black border-green-500/30 hover:border-green-400 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20">
                 <CardHeader>
-                  <CardTitle className="text-green-400 font-mono flex items-center gap-2">
-                    <Scissors className="h-5 w-5" />
-                    {barber.business_name}
-                  </CardTitle>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Avatar className="h-12 w-12 border-2 border-green-500/30">
+                      <AvatarImage src={barber.profile_picture_url || undefined} alt={barber.business_name} />
+                      <AvatarFallback className="bg-black text-green-400">
+                        {barber.business_name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <CardTitle className="text-green-400 font-mono flex items-center gap-2">
+                      <Scissors className="h-5 w-5" />
+                      {barber.business_name}
+                    </CardTitle>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-green-300 font-mono text-sm">

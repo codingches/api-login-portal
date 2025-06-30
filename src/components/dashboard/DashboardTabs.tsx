@@ -6,6 +6,7 @@ import { ClientSuggestions } from "@/components/ClientSuggestions";
 import { ServicesTab } from "./ServicesTab";
 import { AvailabilityTab } from "./AvailabilityTab";
 import { BookingsTab } from "./BookingsTab";
+import { ProfileTab } from "./ProfileTab";
 
 interface DashboardTabsProps {
   barberProfile: any;
@@ -36,6 +37,9 @@ export const DashboardTabs = ({
         <TabsTrigger value="overview" className="data-[state=active]:bg-green-500/20">
           Overview
         </TabsTrigger>
+        <TabsTrigger value="profile" className="data-[state=active]:bg-green-500/20">
+          Profile
+        </TabsTrigger>
         <TabsTrigger value="payments" className="data-[state=active]:bg-green-500/20">
           Payments
         </TabsTrigger>
@@ -58,6 +62,13 @@ export const DashboardTabs = ({
           barberProfile={barberProfile}
           bookings={bookings}
           services={services}
+        />
+      </TabsContent>
+
+      <TabsContent value="profile">
+        <ProfileTab
+          barberProfile={barberProfile}
+          onRefreshData={onRefreshBookings}
         />
       </TabsContent>
 
