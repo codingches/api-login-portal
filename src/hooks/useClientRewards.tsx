@@ -36,7 +36,17 @@ export const useClientRewards = () => {
         .maybeSingle();
 
       if (error) throw error;
-      setRewards(data);
+      
+      // Type cast to ensure current_tier is properly typed
+      if (data) {
+        const typedData: ClientRewards = {
+          ...data,
+          current_tier: data.current_tier as 'bronze' | 'silver' | 'gold' | 'platinum'
+        };
+        setRewards(typedData);
+      } else {
+        setRewards(null);
+      }
     } catch (error: any) {
       console.error('Error fetching rewards:', error);
       toast({

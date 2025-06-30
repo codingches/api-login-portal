@@ -13,6 +13,7 @@ export interface BarberProfile {
   x_handle: string | null;
   phone: string;
   status: 'pending_payment' | 'active' | 'inactive';
+  is_verified: boolean | null;
   created_at: string;
   updated_at: string;
 }
