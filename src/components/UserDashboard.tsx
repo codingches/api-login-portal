@@ -1,16 +1,18 @@
+
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, Star, User, Phone, Mail, MapPin, CreditCard, Trophy } from "lucide-react";
+import { Calendar, Clock, Star, User, Phone, Mail, MapPin, CreditCard, Trophy, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { RewardsCard } from "@/components/RewardsCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export const UserDashboard = () => {
   const { user, signOut } = useAuth();
@@ -89,16 +91,29 @@ export const UserDashboard = () => {
           className="mb-8"
         >
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-green-400">
-              [USER_DASHBOARD]
-            </h1>
-            <Button 
-              onClick={signOut}
-              variant="outline" 
-              className="border-red-500 text-red-400 hover:bg-red-500/20"
-            >
-              LOGOUT
-            </Button>
+            <div className="flex items-center gap-4">
+              <h1 className="text-3xl font-bold text-green-400">
+                [USER_DASHBOARD]
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link to="/">
+                <Button 
+                  variant="outline" 
+                  className="border-green-500 text-green-400 hover:bg-green-500/20"
+                >
+                  <Home className="mr-2 h-4 w-4" />
+                  HOME
+                </Button>
+              </Link>
+              <Button 
+                onClick={signOut}
+                variant="outline" 
+                className="border-red-500 text-red-400 hover:bg-red-500/20"
+              >
+                LOGOUT
+              </Button>
+            </div>
           </div>
 
           <div className="text-green-300 mb-8">

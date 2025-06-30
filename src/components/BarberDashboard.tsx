@@ -1,11 +1,13 @@
+
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, Star, DollarSign, Users, TrendingUp, Shield } from "lucide-react";
+import { Calendar, Clock, Star, DollarSign, Users, TrendingUp, Shield, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBarberData } from "@/hooks/useBarberData";
 import { VerificationBadge } from "@/components/VerificationBadge";
+import { Link } from "react-router-dom";
 
 export const BarberDashboard = () => {
   const { user, signOut } = useAuth();
@@ -50,13 +52,24 @@ export const BarberDashboard = () => {
                 isOwner={true}
               />
             </div>
-            <Button 
-              onClick={signOut}
-              variant="outline" 
-              className="border-red-500 text-red-400 hover:bg-red-500/20"
-            >
-              LOGOUT
-            </Button>
+            <div className="flex items-center gap-3">
+              <Link to="/">
+                <Button 
+                  variant="outline" 
+                  className="border-green-500 text-green-400 hover:bg-green-500/20"
+                >
+                  <Home className="mr-2 h-4 w-4" />
+                  HOME
+                </Button>
+              </Link>
+              <Button 
+                onClick={signOut}
+                variant="outline" 
+                className="border-red-500 text-red-400 hover:bg-red-500/20"
+              >
+                LOGOUT
+              </Button>
+            </div>
           </div>
 
           <div className="text-green-300 mb-8">
