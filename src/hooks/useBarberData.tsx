@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -63,7 +62,7 @@ export const useBarberData = () => {
         .maybeSingle();
 
       if (profileError) throw profileError;
-      setBarberProfile(profileData);
+      setBarberProfile(profileData as BarberProfile);
 
       if (profileData) {
         // Fetch services
