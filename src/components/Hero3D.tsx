@@ -34,20 +34,31 @@ const FloatingText = () => {
   );
 };
 
+const Scene3D = () => {
+  return (
+    <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
+      <Suspense fallback={null}>
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[10, 10, 5]} intensity={1} />
+        <AnimatedSphere />
+        <FloatingText />
+        <OrbitControls 
+          enableZoom={false} 
+          autoRotate 
+          autoRotateSpeed={0.5}
+          enablePan={false}
+        />
+      </Suspense>
+    </Canvas>
+  );
+};
+
 export const Hero3D = () => {
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
       {/* 3D Background */}
       <div className="absolute inset-0 z-0">
-        <Canvas camera={{ position: [0, 0, 5] }}>
-          <Suspense fallback={null}>
-            <ambientLight intensity={0.5} />
-            <directionalLight position={[10, 10, 5]} intensity={1} />
-            <AnimatedSphere />
-            <FloatingText />
-            <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-          </Suspense>
-        </Canvas>
+        <Scene3D />
       </div>
 
       {/* Gradient Overlay */}
