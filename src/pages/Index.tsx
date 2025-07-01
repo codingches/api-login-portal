@@ -4,6 +4,8 @@ import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { BarberGrid } from "@/components/BarberGrid";
 import { BookingModal } from "@/components/BookingModal";
+import { AIChat } from "@/components/AIChat";
+import { BlogSection } from "@/components/BlogSection";
 import { useState } from "react";
 
 const Index = () => {
@@ -39,7 +41,20 @@ const Index = () => {
       <div className="relative z-10">
         <Navigation />
         <HeroSection />
-        <BarberGrid onBookBarber={handleBookBarber} />
+        
+        {/* Main content with AI Chat sidebar */}
+        <div className="flex flex-col lg:flex-row gap-8 px-6">
+          <div className="flex-1">
+            <BarberGrid onBookBarber={handleBookBarber} />
+          </div>
+          
+          {/* AI Chat - Fixed position on larger screens, inline on mobile */}
+          <div className="lg:sticky lg:top-6 lg:h-fit lg:w-80">
+            <AIChat />
+          </div>
+        </div>
+        
+        <BlogSection />
       </div>
 
       <BookingModal 

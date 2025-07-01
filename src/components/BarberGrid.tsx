@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { MapPin, Scissors, Phone, DollarSign, Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Scissors, Phone, DollarSign, Star, Shield } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -16,6 +17,7 @@ interface Barber {
   x_handle: string | null;
   phone: string;
   status: string;
+  is_verified: boolean | null;
   profile_picture_url: string | null;
 }
 
@@ -30,7 +32,7 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
       const { data, error } = await supabase
         .from('barber_profiles')
         .select('*')
-        .eq('status', 'active');
+        .in('status', ['active', 'pending_payment']); // Include both active and pending payment barbers
       
       if (error) throw error;
       return data as Barber[];
@@ -86,7 +88,7 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
             [ACTIVE_NETWORK]
           </h2>
           <p className="text-green-300 font-mono">
-            {barbers?.length || 0} verified barbers online
+            {barbers?.length || 0} barbers available
           </p>
         </motion.div>
 
@@ -107,10 +109,25 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
                         {barber.business_name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <CardTitle className="text-green-400 font-mono flex items-center gap-2">
-                      <Scissors className="h-5 w-5" />
-                      {barber.business_name}
-                    </CardTitle>
+                    <div className="flex-1">
+                      <CardTitle className="text-green-400 font-mono flex items-center gap-2">
+                        <Scissors className="h-5 w-5" />
+                        {barber.business_name}
+                      </CardTitle>
+                      <div className="flex gap-2 mt-1">
+                        {barber.is_verified && (
+                          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                            <Shield className="h-3 w-3 mr-1" />
+                            Verified
+                          </Badge>
+                        )}
+                        {barber.status === 'pending_payment' && (
+                          <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                            Pending
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -143,8 +160,9 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
                     <Button
                       onClick={() => onBookBarber(barber)}
                       className="w-full bg-green-500 hover:bg-green-600 text-black font-mono"
+                      disabled={barber.status === 'pending_payment'}
                     >
-                      [BOOK_NOW]
+                      {barber.status === 'pending_payment' ? '[PENDING_ACTIVATION]' : '[BOOK_NOW]'}
                     </Button>
                   </div>
                 </CardContent>
@@ -156,7 +174,7 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
         {barbers && barbers.length === 0 && (
           <div className="text-center py-12">
             <p className="text-green-400/60 font-mono text-lg">
-              [NO_ACTIVE_BARBERS_FOUND]
+              [NO_BARBERS_FOUND]
             </p>
             <p className="text-green-400/40 font-mono text-sm mt-2">
               Check back later or register as a barber to join the network
