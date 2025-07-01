@@ -9,6 +9,7 @@ import { Calendar, Clock, Star, User, Phone, Mail, MapPin, CreditCard, Trophy, H
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { RewardsCard } from "@/components/RewardsCard";
+import { ProfilePictureUpload } from "@/components/ProfilePictureUpload";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -16,7 +17,7 @@ import { Link } from "react-router-dom";
 
 export const UserDashboard = () => {
   const { user, signOut } = useAuth();
-  const { profile, updateProfile, loading: profileLoading } = useUserProfile();
+  const { profile, updateProfile, loading: profileLoading, refetchProfile } = useUserProfile();
   const [editingProfile, setEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
     full_name: profile?.full_name || '',
@@ -70,6 +71,11 @@ export const UserDashboard = () => {
     if (success) {
       setEditingProfile(false);
     }
+  };
+
+  const handleImageUpdate = (url: string | null) => {
+    // Refresh the profile data after image update
+    refetchProfile();
   };
 
   const getStatusColor = (status: string) => {
@@ -325,87 +331,103 @@ export const UserDashboard = () => {
           </TabsContent>
 
           <TabsContent value="profile">
-            <Card className="bg-black border-green-500/30">
-              <CardHeader>
-                <CardTitle className="text-green-400">Profile Settings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {profileLoading ? (
-                  <div className="text-green-300/60">Loading profile...</div>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="email" className="text-green-400">Email</Label>
-                          <Input
-                            id="email"
-                            value={user?.email || ''}
-                            disabled
-                            className="bg-black/50 border-green-500/50 text-green-300"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="full_name" className="text-green-400">Full Name</Label>
-                          <Input
-                            id="full_name"
-                            value={profileForm.full_name}
-                            onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
-                            disabled={!editingProfile}
-                            className="bg-black/50 border-green-500/50 text-green-300"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="phone" className="text-green-400">Phone</Label>
-                          <Input
-                            id="phone"
-                            value={profileForm.phone}
-                            onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
-                            disabled={!editingProfile}
-                            className="bg-black/50 border-green-500/50 text-green-300"
-                          />
+            <div className="space-y-6">
+              <Card className="bg-black border-green-500/30">
+                <CardHeader>
+                  <CardTitle className="text-green-400">Profile Picture</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ProfilePictureUpload
+                    currentImageUrl={profile?.profile_picture_url}
+                    onImageUpdate={handleImageUpdate}
+                    userType="user"
+                    userId={user?.id || ''}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card className="bg-black border-green-500/30">
+                <CardHeader>
+                  <CardTitle className="text-green-400">Profile Information</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {profileLoading ? (
+                    <div className="text-green-300/60">Loading profile...</div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="email" className="text-green-400">Email</Label>
+                            <Input
+                              id="email"
+                              value={user?.email || ''}
+                              disabled
+                              className="bg-black/50 border-green-500/50 text-green-300"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="full_name" className="text-green-400">Full Name</Label>
+                            <Input
+                              id="full_name"
+                              value={profileForm.full_name}
+                              onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
+                              disabled={!editingProfile}
+                              className="bg-black/50 border-green-500/50 text-green-300"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="phone" className="text-green-400">Phone</Label>
+                            <Input
+                              id="phone"
+                              value={profileForm.phone}
+                              onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
+                              disabled={!editingProfile}
+                              className="bg-black/50 border-green-500/50 text-green-300"
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex gap-3">
-                      {editingProfile ? (
-                        <>
+                      
+                      <div className="flex gap-3">
+                        {editingProfile ? (
+                          <>
+                            <Button 
+                              onClick={handleProfileSave}
+                              className="bg-green-500 hover:bg-green-600 text-black"
+                            >
+                              Save Changes
+                            </Button>
+                            <Button 
+                              onClick={() => {
+                                setEditingProfile(false);
+                                setProfileForm({
+                                  full_name: profile?.full_name || '',
+                                  phone: profile?.phone || '',
+                                });
+                              }}
+                              variant="outline"
+                              className="border-gray-500 text-gray-400"
+                            >
+                              Cancel
+                            </Button>
+                          </>
+                        ) : (
                           <Button 
-                            onClick={handleProfileSave}
+                            onClick={() => setEditingProfile(true)}
                             className="bg-green-500 hover:bg-green-600 text-black"
                           >
-                            Save Changes
+                            Edit Profile
                           </Button>
-                          <Button 
-                            onClick={() => {
-                              setEditingProfile(false);
-                              setProfileForm({
-                                full_name: profile?.full_name || '',
-                                phone: profile?.phone || '',
-                              });
-                            }}
-                            variant="outline"
-                            className="border-gray-500 text-gray-400"
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ) : (
-                        <Button 
-                          onClick={() => setEditingProfile(true)}
-                          className="bg-green-500 hover:bg-green-600 text-black"
-                        >
-                          Edit Profile
-                        </Button>
-                      )}
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
