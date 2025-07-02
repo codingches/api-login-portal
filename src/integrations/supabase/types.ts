@@ -293,6 +293,33 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          sender_name: string
+          sender_type: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          sender_name: string
+          sender_type: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          sender_name?: string
+          sender_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           booking_id: string | null
