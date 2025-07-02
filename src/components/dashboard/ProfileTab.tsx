@@ -63,6 +63,7 @@ export const ProfileTab = ({ barberProfile, onRefreshData }: ProfileTabProps) =>
   };
 
   const handleImageUpdate = (url: string | null) => {
+    console.log('Profile picture updated:', url);
     // The ProfilePictureUpload component handles the database update,
     // so we just need to refresh the data
     onRefreshData();

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Scissors, Phone, DollarSign, Star, Shield } from "lucide-react";
+import { MapPin, Scissors, Phone, DollarSign, Star, Shield, Check } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -113,14 +113,13 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
                       <CardTitle className="text-green-400 font-mono flex items-center gap-2">
                         <Scissors className="h-5 w-5" />
                         {barber.business_name}
+                        {barber.is_verified && (
+                          <div className="bg-blue-500 rounded-full p-1">
+                            <Check className="h-3 w-3 text-white" />
+                          </div>
+                        )}
                       </CardTitle>
                       <div className="flex gap-2 mt-1">
-                        {barber.is_verified && (
-                          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                            <Shield className="h-3 w-3 mr-1" />
-                            Verified
-                          </Badge>
-                        )}
                         {barber.status === 'pending_payment' && (
                           <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
                             Pending
