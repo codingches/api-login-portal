@@ -6,11 +6,15 @@ import { BarberGrid } from "@/components/BarberGrid";
 import { BookingModal } from "@/components/BookingModal";
 import { AIChat } from "@/components/AIChat";
 import { BlogSection } from "@/components/BlogSection";
+import { FeedbackChatroom } from "@/components/FeedbackChatroom";
+import { Button } from "@/components/ui/button";
+import { MessageCircle } from "lucide-react";
 import { useState } from "react";
 
 const Index = () => {
   const [selectedBarber, setSelectedBarber] = useState(null);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isChatroomOpen, setIsChatroomOpen] = useState(false);
 
   const handleBookBarber = (barber: any) => {
     setSelectedBarber(barber);
@@ -57,10 +61,30 @@ const Index = () => {
         <BlogSection />
       </div>
 
+      {/* Floating Chatroom Button */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1 }}
+        className="fixed bottom-6 left-6 z-50"
+      >
+        <Button
+          onClick={() => setIsChatroomOpen(true)}
+          className="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-14 h-14 shadow-lg shadow-blue-500/25"
+        >
+          <MessageCircle className="h-6 w-6" />
+        </Button>
+      </motion.div>
+
       <BookingModal 
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
         barber={selectedBarber}
+      />
+
+      <FeedbackChatroom
+        isOpen={isChatroomOpen}
+        onClose={() => setIsChatroomOpen(false)}
       />
     </div>
   );

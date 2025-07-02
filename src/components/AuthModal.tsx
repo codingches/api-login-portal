@@ -43,6 +43,8 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           description: "Welcome back to the network!",
         });
         onClose();
+        // Redirect to main page
+        window.location.href = '/';
       } else {
         const { error } = await supabase.auth.signUp({
           email: formData.email,
@@ -50,7 +52,8 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           options: {
             data: {
               full_name: formData.fullName,
-            }
+            },
+            emailRedirectTo: `${window.location.origin}/`
           }
         });
         
@@ -61,6 +64,8 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           description: "Check your email to confirm your account!",
         });
         onClose();
+        // Redirect to main page
+        window.location.href = '/';
       }
     } catch (error: any) {
       toast({

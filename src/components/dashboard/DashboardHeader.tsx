@@ -4,8 +4,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProfilePictureUpload } from "@/components/ProfilePictureUpload";
 import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, User, Settings, Home } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 interface DashboardHeaderProps {
   barberProfile: any;
@@ -67,6 +68,17 @@ export const DashboardHeader = ({ barberProfile, onSignOut }: DashboardHeaderPro
           </div>
           
           <div className="flex items-center gap-3">
+            <Link to="/">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-green-500/30 text-green-400"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Home
+              </Button>
+            </Link>
+            
             <Button
               variant="outline"
               size="sm"

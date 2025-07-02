@@ -1,11 +1,13 @@
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, Send, Bot, User } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
@@ -18,13 +20,23 @@ export const AIChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hello! I'm your AI assistant. I can help you with barbering questions, booking advice, or general chat. How can I help you today?",
+      text: "Hello! I'm your AI assistant powered by OpenAI. I can help you with barbering questions, booking advice, or general chat. How can I help you today?",
       isUser: false,
       timestamp: new Date(),
     },
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -37,35 +49,54 @@ export const AIChat = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = inputMessage;
     setInputMessage('');
     setIsLoading(true);
 
-    // Simulate AI response (you can replace this with actual AI API call)
-    setTimeout(() => {
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-chat', {
+        body: { 
+          prompt: currentMessage,
+          context: "You are a helpful AI assistant for a barber booking platform. Help users with questions about barber services, booking appointments, and general inquiries. Be friendly and professional."
+        }
+      });
+
+      if (error) throw error;
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: generateAIResponse(inputMessage),
+        text: data.generatedText || "I'm sorry, I couldn't process your request. Please try again.",
         isUser: false,
         timestamp: new Date(),
       };
+
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error calling AI chat:', error);
+      
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "I'm sorry, I'm having trouble connecting right now. Please try again later.",
+        isUser: false,
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, errorResponse]);
+      
+      toast({
+        title: "AI Chat Error",
+        description: "Failed to get AI response. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const generateAIResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes('haircut') || lowerMessage.includes('cut')) {
-      return "Great choice! Our barbers specialize in various haircut styles. Would you like me to help you find a barber near you or provide information about different haircut styles?";
-    } else if (lowerMessage.includes('book') || lowerMessage.includes('appointment')) {
-      return "I can help you book an appointment! Browse our available barbers above and click 'BOOK NOW' on any barber's profile to schedule your appointment.";
-    } else if (lowerMessage.includes('price') || lowerMessage.includes('cost')) {
-      return "Prices vary by barber and service type. You can see each barber's pricing in their profile card. Most cuts range from $20-$50 depending on the service and location.";
-    } else if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-      return "Hello! I'm here to help you with any questions about our barber services. What would you like to know?";
-    } else {
-      return "That's an interesting question! I'm here to help with barbering services, booking appointments, and general inquiries. Is there something specific about our barber network I can help you with?";
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
@@ -79,15 +110,17 @@ export const AIChat = () => {
         <CardHeader className="pb-3">
           <CardTitle className="text-green-400 font-mono flex items-center gap-2">
             <Bot className="h-5 w-5" />
-            AI Assistant
+            AI Assistant (OpenAI)
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0 flex flex-col h-80">
           <ScrollArea className="flex-1 px-4">
             <div className="space-y-3">
               {messages.map((message) => (
-                <div
+                <motion.div
                   key={message.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
                   className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
@@ -105,19 +138,27 @@ export const AIChat = () => {
                       )}
                       <span>{message.text}</span>
                     </div>
+                    <div className="text-xs opacity-60 mt-1">
+                      {message.timestamp.toLocaleTimeString()}
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-gray-800/50 text-green-400 border border-gray-700 p-3 rounded-lg font-mono text-sm">
                     <div className="flex items-center gap-2">
                       <Bot className="h-4 w-4" />
-                      <span>Thinking...</span>
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse delay-100"></div>
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse delay-200"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
           
@@ -126,7 +167,7 @@ export const AIChat = () => {
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                onKeyPress={handleKeyPress}
                 placeholder="Ask me anything..."
                 className="bg-black/50 border-green-500/30 text-green-400 font-mono text-sm"
                 disabled={isLoading}

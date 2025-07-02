@@ -32,7 +32,7 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
       const { data, error } = await supabase
         .from('barber_profiles')
         .select('*')
-        .in('status', ['active', 'pending_payment']); // Include both active and pending payment barbers
+        .in('status', ['active', 'pending_payment']);
       
       if (error) throw error;
       return data as Barber[];
@@ -122,7 +122,12 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
                       <div className="flex gap-2 mt-1">
                         {barber.status === 'pending_payment' && (
                           <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-                            Pending
+                            Setting Up
+                          </Badge>
+                        )}
+                        {barber.status === 'active' && (
+                          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                            Available
                           </Badge>
                         )}
                       </div>
@@ -156,13 +161,30 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
                   )}
 
                   <div className="pt-4">
-                    <Button
-                      onClick={() => onBookBarber(barber)}
-                      className="w-full bg-green-500 hover:bg-green-600 text-black font-mono"
-                      disabled={barber.status === 'pending_payment'}
-                    >
-                      {barber.status === 'pending_payment' ? '[PENDING_ACTIVATION]' : '[BOOK_NOW]'}
-                    </Button>
+                    {barber.status === 'active' ? (
+                      <Button
+                        onClick={() => onBookBarber(barber)}
+                        className="w-full bg-green-500 hover:bg-green-600 text-black font-mono"
+                      >
+                        [BOOK_NOW]
+                      </Button>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="text-center text-yellow-400 font-mono text-sm mb-2">
+                          [COMPLETING_SETUP]
+                        </div>
+                        <Button
+                          onClick={() => onBookBarber(barber)}
+                          variant="outline"
+                          className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10 font-mono"
+                        >
+                          [CONTACT_FOR_BOOKING]
+                        </Button>
+                        <p className="text-xs text-yellow-400/70 text-center">
+                          This barber is setting up their profile. You can still contact them for services!
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
