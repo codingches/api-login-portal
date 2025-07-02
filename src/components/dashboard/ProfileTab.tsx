@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -63,11 +62,26 @@ export const ProfileTab = ({ barberProfile, onRefreshData }: ProfileTabProps) =>
   };
 
   const handleImageUpdate = (url: string | null) => {
-    console.log('Profile picture updated:', url);
+    console.log('ProfileTab: Profile picture updated:', url);
+    console.log('ProfileTab: Current barber profile:', barberProfile);
+    console.log('ProfileTab: Calling onRefreshData...');
+    
+    // Show a toast to confirm the update was received
+    toast({
+      title: "Processing...",
+      description: "Refreshing profile data...",
+    });
+    
     // The ProfilePictureUpload component handles the database update,
     // so we just need to refresh the data
     onRefreshData();
   };
+
+  console.log('ProfileTab render:', {
+    userIdFromAuth: user?.id,
+    barberProfileUserId: barberProfile?.user_id,
+    currentProfilePicture: barberProfile?.profile_picture_url
+  });
 
   return (
     <div className="space-y-6">
@@ -84,6 +98,10 @@ export const ProfileTab = ({ barberProfile, onRefreshData }: ProfileTabProps) =>
             userType="barber"
             userId={user?.id || ''}
           />
+          <div className="text-xs text-green-400/60 font-mono">
+            Debug: User ID: {user?.id}<br/>
+            Current Image: {barberProfile?.profile_picture_url ? 'Set' : 'Not set'}
+          </div>
         </CardContent>
       </Card>
 
