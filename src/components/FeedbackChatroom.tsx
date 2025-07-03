@@ -10,6 +10,7 @@ import { MessageCircle, Send, User, Scissors, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { Tables } from '@/integrations/supabase/types';
 
 interface Message {
   id: string;
@@ -71,7 +72,14 @@ export const FeedbackChatroom = ({ isOpen, onClose }: FeedbackChatroomProps) => 
         .limit(100);
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      // Type assertion to ensure sender_type matches our union type
+      const typedMessages: Message[] = (data || []).map(msg => ({
+        ...msg,
+        sender_type: msg.sender_type as 'user' | 'barber'
+      }));
+      
+      setMessages(typedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
@@ -85,7 +93,11 @@ export const FeedbackChatroom = ({ isOpen, onClose }: FeedbackChatroomProps) => 
         schema: 'public',
         table: 'feedback_messages'
       }, (payload) => {
-        setMessages(prev => [...prev, payload.new as Message]);
+        const newMsg = {
+          ...payload.new,
+          sender_type: payload.new.sender_type as 'user' | 'barber'
+        } as Message;
+        setMessages(prev => [...prev, newMsg]);
       })
       .subscribe();
 
