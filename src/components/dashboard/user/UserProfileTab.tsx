@@ -51,6 +51,10 @@ export const UserProfileTab = ({
     }
   };
 
+  const handleImageUpdate = (url: string | null) => {
+    refetchProfile();
+  };
+
   if (profileLoading) {
     return (
       <div className="text-green-400 font-mono text-center py-8">
@@ -68,7 +72,8 @@ export const UserProfileTab = ({
         <div className="flex flex-col items-center space-y-4">
           <ProfilePictureUpload
             currentImageUrl={profile?.profile_picture_url}
-            onUploadComplete={refetchProfile}
+            onImageUpdate={handleImageUpdate}
+            userType="user"
             userId={user?.id}
           />
           <div className="text-center">

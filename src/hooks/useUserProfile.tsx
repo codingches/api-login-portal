@@ -49,8 +49,8 @@ export const useUserProfile = () => {
     }
   };
 
-  const updateProfile = async (updates: Partial<UserProfile>) => {
-    if (!user) return false;
+  const updateProfile = async (updates: Partial<UserProfile>): Promise<void> => {
+    if (!user) return;
 
     try {
       const { data, error } = await supabase
@@ -70,7 +70,6 @@ export const useUserProfile = () => {
         title: "Success",
         description: "Profile updated successfully",
       });
-      return true;
     } catch (error: any) {
       console.error('Error updating profile:', error);
       toast({
@@ -78,7 +77,7 @@ export const useUserProfile = () => {
         description: "Failed to update profile",
         variant: "destructive",
       });
-      return false;
+      throw error;
     }
   };
 
