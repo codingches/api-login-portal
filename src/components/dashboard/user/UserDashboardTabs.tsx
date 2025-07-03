@@ -7,11 +7,33 @@ import { UserReviewsTab } from "./UserReviewsTab";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 
 interface UserDashboardTabsProps {
+  user: any;
+  profile: any;
+  profileLoading: boolean;
   bookings: any[];
-  onRefreshBookings: () => void;
+  bookingsLoading: boolean;
+  reviews: any[];
+  reviewsLoading: boolean;
+  updateProfile: (updates: any) => Promise<void>;
+  refetchProfile: () => Promise<void>;
 }
 
-export const UserDashboardTabs = ({ bookings, onRefreshBookings }: UserDashboardTabsProps) => {
+export const UserDashboardTabs = ({ 
+  user,
+  profile,
+  profileLoading,
+  bookings, 
+  bookingsLoading,
+  reviews,
+  reviewsLoading,
+  updateProfile,
+  refetchProfile
+}: UserDashboardTabsProps) => {
+  const onRefreshBookings = () => {
+    // This would be handled by the parent component
+    console.log('Refreshing bookings...');
+  };
+
   return (
     <Tabs defaultValue="overview" className="space-y-6">
       <TabsList className="bg-black border border-green-500/30">
@@ -33,7 +55,11 @@ export const UserDashboardTabs = ({ bookings, onRefreshBookings }: UserDashboard
       </TabsList>
 
       <TabsContent value="overview">
-        <UserOverviewTab bookings={bookings} />
+        <UserOverviewTab 
+          bookings={bookings} 
+          reviews={reviews}
+          bookingsLoading={bookingsLoading}
+        />
       </TabsContent>
 
       <TabsContent value="bookings">
@@ -52,7 +78,13 @@ export const UserDashboardTabs = ({ bookings, onRefreshBookings }: UserDashboard
       </TabsContent>
 
       <TabsContent value="profile">
-        <UserProfileTab />
+        <UserProfileTab 
+          user={user}
+          profile={profile}
+          profileLoading={profileLoading}
+          updateProfile={updateProfile}
+          refetchProfile={refetchProfile}
+        />
       </TabsContent>
     </Tabs>
   );

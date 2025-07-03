@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,7 +36,7 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
         .in('status', ['active', 'pending_payment']);
       
       if (error) throw error;
-      return data as Barber[];
+      return data;
     },
   });
 

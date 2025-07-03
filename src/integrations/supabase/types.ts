@@ -50,6 +50,7 @@ export type Database = {
       barber_profiles: {
         Row: {
           address: string | null
+          average_rating: number | null
           bank_account_number: string | null
           bank_account_verified: boolean | null
           bank_routing_number: string | null
@@ -66,6 +67,7 @@ export type Database = {
           specialty: string
           status: string
           stripe_account_id: string | null
+          total_bookings: number | null
           updated_at: string
           user_id: string | null
           verification_paid_at: string | null
@@ -73,6 +75,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          average_rating?: number | null
           bank_account_number?: string | null
           bank_account_verified?: boolean | null
           bank_routing_number?: string | null
@@ -89,6 +92,7 @@ export type Database = {
           specialty: string
           status?: string
           stripe_account_id?: string | null
+          total_bookings?: number | null
           updated_at?: string
           user_id?: string | null
           verification_paid_at?: string | null
@@ -96,6 +100,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          average_rating?: number | null
           bank_account_number?: string | null
           bank_account_verified?: boolean | null
           bank_routing_number?: string | null
@@ -112,6 +117,7 @@ export type Database = {
           specialty?: string
           status?: string
           stripe_account_id?: string | null
+          total_bookings?: number | null
           updated_at?: string
           user_id?: string | null
           verification_paid_at?: string | null
@@ -444,6 +450,74 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      photo_gallery: {
+        Row: {
+          barber_id: string | null
+          caption: string | null
+          category: string | null
+          created_at: string
+          id: string
+          photo_url: string
+        }
+        Insert: {
+          barber_id?: string | null
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          photo_url: string
+        }
+        Update: {
+          barber_id?: string | null
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          photo_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_gallery_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          message: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message: string
+          read_at?: string | null
+          title: string
+          type?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       real_time_payments: {
         Row: {

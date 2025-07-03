@@ -3,15 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ProfilePictureUpload } from "@/components/ProfilePictureUpload";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { ProfilePictureUpload } from "@/components/ProfilePictureUpload";
 
 interface UserProfileTabProps {
   user: any;
   profile: any;
   profileLoading: boolean;
-  updateProfile: (data: any) => Promise<boolean>;
-  refetchProfile: () => void;
+  updateProfile: (updates: any) => Promise<void>;
+  refetchProfile: () => Promise<void>;
 }
 
 export const UserProfileTab = ({ 
@@ -21,120 +22,98 @@ export const UserProfileTab = ({
   updateProfile, 
   refetchProfile 
 }: UserProfileTabProps) => {
-  const [editingProfile, setEditingProfile] = useState(false);
-  const [profileForm, setProfileForm] = useState({
+  const { toast } = useToast();
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     phone: profile?.phone || '',
   });
 
-  const handleProfileSave = async () => {
-    const success = await updateProfile(profileForm);
-    if (success) {
-      setEditingProfile(false);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    setIsUpdating(true);
+    try {
+      await updateProfile(formData);
+      toast({
+        title: "Profile updated!",
+        description: "Your profile has been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
     }
   };
 
-  const handleImageUpdate = (url: string | null) => {
-    refetchProfile();
-  };
+  if (profileLoading) {
+    return (
+      <div className="text-green-400 font-mono text-center py-8">
+        [LOADING_PROFILE...]
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <Card className="bg-black border-green-500/30">
-        <CardHeader>
-          <CardTitle className="text-green-400">Profile Picture</CardTitle>
-        </CardHeader>
-        <CardContent>
+    <Card className="bg-black border-green-500/30">
+      <CardHeader>
+        <CardTitle className="text-green-400 font-mono">Profile Settings</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex flex-col items-center space-y-4">
           <ProfilePictureUpload
             currentImageUrl={profile?.profile_picture_url}
-            onImageUpdate={handleImageUpdate}
-            userType="user"
-            userId={user?.id || ''}
+            onUploadComplete={refetchProfile}
+            userId={user?.id}
           />
-        </CardContent>
-      </Card>
+          <div className="text-center">
+            <p className="text-green-400 font-mono">{user?.email}</p>
+            <p className="text-green-300/60 text-sm">Email address</p>
+          </div>
+        </div>
 
-      <Card className="bg-black border-green-500/30">
-        <CardHeader>
-          <CardTitle className="text-green-400">Profile Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {profileLoading ? (
-            <div className="text-green-300/60">Loading profile...</div>
-          ) : (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-green-400">Email</Label>
-                    <Input
-                      id="email"
-                      value={user?.email || ''}
-                      disabled
-                      className="bg-black/50 border-green-500/50 text-green-300"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="full_name" className="text-green-400">Full Name</Label>
-                    <Input
-                      id="full_name"
-                      value={profileForm.full_name}
-                      onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
-                      disabled={!editingProfile}
-                      className="bg-black/50 border-green-500/50 text-green-300"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-green-400">Phone</Label>
-                    <Input
-                      id="phone"
-                      value={profileForm.phone}
-                      onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
-                      disabled={!editingProfile}
-                      className="bg-black/50 border-green-500/50 text-green-300"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex gap-3">
-                {editingProfile ? (
-                  <>
-                    <Button 
-                      onClick={handleProfileSave}
-                      className="bg-green-500 hover:bg-green-600 text-black"
-                    >
-                      Save Changes
-                    </Button>
-                    <Button 
-                      onClick={() => {
-                        setEditingProfile(false);
-                        setProfileForm({
-                          full_name: profile?.full_name || '',
-                          phone: profile?.phone || '',
-                        });
-                      }}
-                      variant="outline"
-                      className="border-gray-500 text-gray-400"
-                    >
-                      Cancel
-                    </Button>
-                  </>
-                ) : (
-                  <Button 
-                    onClick={() => setEditingProfile(true)}
-                    className="bg-green-500 hover:bg-green-600 text-black"
-                  >
-                    Edit Profile
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="full_name" className="text-green-300 font-mono">
+              Full Name
+            </Label>
+            <Input
+              id="full_name"
+              value={formData.full_name}
+              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+              className="bg-black border-green-500/30 text-green-300 font-mono"
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="phone" className="text-green-300 font-mono">
+              Phone Number
+            </Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className="bg-black border-green-500/30 text-green-300 font-mono"
+              placeholder="Enter your phone number"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isUpdating}
+            className="w-full bg-green-500 hover:bg-green-600 text-black font-mono"
+          >
+            {isUpdating ? '[UPDATING...]' : '[UPDATE_PROFILE]'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
