@@ -19,6 +19,8 @@ interface Barber {
   status: string;
   is_verified: boolean | null;
   profile_picture_url: string | null;
+  average_rating: number | null;
+  total_bookings: number | null;
 }
 
 interface BarberGridProps {
@@ -133,6 +135,32 @@ export const BarberGrid = ({ onBookBarber }: BarberGridProps) => {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Rating Display */}
+                  {barber.average_rating && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-4 w-4 ${
+                              star <= (barber.average_rating || 0)
+                                ? 'text-yellow-400 fill-current'
+                                : 'text-gray-600'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-green-400 font-mono text-sm">
+                        {barber.average_rating.toFixed(1)}
+                      </span>
+                      {barber.total_bookings && (
+                        <span className="text-green-400/60 font-mono text-xs">
+                          ({barber.total_bookings} bookings)
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-green-300 font-mono text-sm">

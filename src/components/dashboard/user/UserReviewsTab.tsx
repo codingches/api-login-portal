@@ -1,13 +1,43 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
-interface UserReviewsTabProps {
-  reviews: any[];
-  reviewsLoading: boolean;
+interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  barber_profiles: {
+    business_name: string;
+  };
 }
 
-export const UserReviewsTab = ({ reviews, reviewsLoading }: UserReviewsTabProps) => {
+export const UserReviewsTab = () => {
+  const { user } = useAuth();
+
+  const { data: reviews, isLoading: reviewsLoading } = useQuery({
+    queryKey: ['user-reviews', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      
+      const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+          *,
+          barber_profiles!inner(business_name)
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as Review[];
+    },
+    enabled: !!user,
+  });
+
   return (
     <Card className="bg-black border-green-500/30">
       <CardHeader>
@@ -18,7 +48,7 @@ export const UserReviewsTab = ({ reviews, reviewsLoading }: UserReviewsTabProps)
           <div className="text-green-300/60">Loading reviews...</div>
         ) : reviews && reviews.length > 0 ? (
           <div className="space-y-4">
-            {reviews.map((review: any) => (
+            {reviews.map((review) => (
               <div key={review.id} className="border border-green-500/30 rounded-lg p-4">
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="text-green-400 font-bold">{review.barber_profiles.business_name}</h3>

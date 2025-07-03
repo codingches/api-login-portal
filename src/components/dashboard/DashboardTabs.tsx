@@ -7,6 +7,8 @@ import { ServicesTab } from "./ServicesTab";
 import { AvailabilityTab } from "./AvailabilityTab";
 import { BookingsTab } from "./BookingsTab";
 import { ProfileTab } from "./ProfileTab";
+import { ReviewList } from "@/components/reviews/ReviewList";
+import { PhotoGallery } from "@/components/gallery/PhotoGallery";
 
 interface DashboardTabsProps {
   barberProfile: any;
@@ -40,6 +42,12 @@ export const DashboardTabs = ({
         <TabsTrigger value="profile" className="data-[state=active]:bg-green-500/20">
           Profile
         </TabsTrigger>
+        <TabsTrigger value="gallery" className="data-[state=active]:bg-green-500/20">
+          Gallery
+        </TabsTrigger>
+        <TabsTrigger value="reviews" className="data-[state=active]:bg-green-500/20">
+          Reviews
+        </TabsTrigger>
         <TabsTrigger value="payments" className="data-[state=active]:bg-green-500/20">
           Payments
         </TabsTrigger>
@@ -70,6 +78,17 @@ export const DashboardTabs = ({
           barberProfile={barberProfile}
           onRefreshData={onRefreshBookings}
         />
+      </TabsContent>
+
+      <TabsContent value="gallery">
+        <PhotoGallery
+          barberId={barberProfile.id}
+          isOwner={true}
+        />
+      </TabsContent>
+
+      <TabsContent value="reviews">
+        <ReviewList barberId={barberProfile.id} />
       </TabsContent>
 
       <TabsContent value="payments">
