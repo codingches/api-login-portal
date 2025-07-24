@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.12 (cd3cf9e)"
+  }
   public: {
     Tables: {
       barber_availability: {
@@ -42,6 +47,94 @@ export type Database = {
             foreignKeyName: "barber_availability_barber_id_fkey"
             columns: ["barber_id"]
             isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      barber_live_location: {
+        Row: {
+          barber_id: string | null
+          client_id: string | null
+          current_lat: number
+          current_lng: number
+          destination_lat: number | null
+          destination_lng: number | null
+          eta_minutes: number | null
+          id: string
+          is_en_route: boolean
+          updated_at: string
+        }
+        Insert: {
+          barber_id?: string | null
+          client_id?: string | null
+          current_lat: number
+          current_lng: number
+          destination_lat?: number | null
+          destination_lng?: number | null
+          eta_minutes?: number | null
+          id?: string
+          is_en_route?: boolean
+          updated_at?: string
+        }
+        Update: {
+          barber_id?: string | null
+          client_id?: string | null
+          current_lat?: number
+          current_lng?: number
+          destination_lat?: number | null
+          destination_lng?: number | null
+          eta_minutes?: number | null
+          id?: string
+          is_en_route?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_live_location_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: true
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      barber_live_status: {
+        Row: {
+          barber_id: string | null
+          current_client: string | null
+          estimated_finish_time: string | null
+          id: string
+          last_location_lat: number | null
+          last_location_lng: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          barber_id?: string | null
+          current_client?: string | null
+          estimated_finish_time?: string | null
+          id?: string
+          last_location_lat?: number | null
+          last_location_lng?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          barber_id?: string | null
+          current_client?: string | null
+          estimated_finish_time?: string | null
+          id?: string
+          last_location_lat?: number | null
+          last_location_lng?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_live_status_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: true
             referencedRelation: "barber_profiles"
             referencedColumns: ["id"]
           },
@@ -219,6 +312,53 @@ export type Database = {
           },
         ]
       }
+      booking_queue: {
+        Row: {
+          barber_id: string | null
+          client_name: string
+          client_phone: string | null
+          created_at: string
+          estimated_wait_time: number
+          id: string
+          queue_position: number
+          service_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          barber_id?: string | null
+          client_name: string
+          client_phone?: string | null
+          created_at?: string
+          estimated_wait_time?: number
+          id?: string
+          queue_position: number
+          service_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          barber_id?: string | null
+          client_name?: string
+          client_phone?: string | null
+          created_at?: string
+          estimated_wait_time?: number
+          id?: string
+          queue_position?: number
+          service_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_queue_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           barber_id: string | null
@@ -263,6 +403,76 @@ export type Database = {
           },
         ]
       }
+      chat_conversations: {
+        Row: {
+          barber_id: string | null
+          client_id: string | null
+          created_at: string
+          id: string
+          last_message_at: string | null
+        }
+        Insert: {
+          barber_id?: string | null
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+        }
+        Update: {
+          barber_id?: string | null
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_conversations_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          message_type: string
+          sender_id: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          message_type?: string
+          sender_id?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          message_type?: string
+          sender_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_rewards: {
         Row: {
           created_at: string | null
@@ -296,6 +506,89 @@ export type Database = {
           total_spent?: number | null
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      dynamic_pricing: {
+        Row: {
+          barber_id: string | null
+          base_price: number
+          created_at: string
+          demand_level: string
+          effective_until: string | null
+          id: string
+          service_name: string
+          surge_multiplier: number
+          updated_at: string
+        }
+        Insert: {
+          barber_id?: string | null
+          base_price: number
+          created_at?: string
+          demand_level?: string
+          effective_until?: string | null
+          id?: string
+          service_name: string
+          surge_multiplier?: number
+          updated_at?: string
+        }
+        Update: {
+          barber_id?: string | null
+          base_price?: number
+          created_at?: string
+          demand_level?: string
+          effective_until?: string | null
+          id?: string
+          service_name?: string
+          surge_multiplier?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dynamic_pricing_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_broadcasts: {
+        Row: {
+          affected_area: string | null
+          broadcast_type: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          message: string
+          priority: string
+          sender_id: string | null
+          title: string
+        }
+        Insert: {
+          affected_area?: string | null
+          broadcast_type: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          message: string
+          priority?: string
+          sender_id?: string | null
+          title: string
+        }
+        Update: {
+          affected_area?: string | null
+          broadcast_type?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          message?: string
+          priority?: string
+          sender_id?: string | null
+          title?: string
         }
         Relationships: []
       }
@@ -360,6 +653,44 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nearby_barber_tracker: {
+        Row: {
+          area_name: string
+          average_wait_time: number
+          barber_id: string | null
+          current_queue_length: number
+          distance_km: number
+          id: string
+          last_updated: string
+        }
+        Insert: {
+          area_name: string
+          average_wait_time?: number
+          barber_id?: string | null
+          current_queue_length?: number
+          distance_km: number
+          id?: string
+          last_updated?: string
+        }
+        Update: {
+          area_name?: string
+          average_wait_time?: number
+          barber_id?: string | null
+          current_queue_length?: number
+          distance_km?: number
+          id?: string
+          last_updated?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nearby_barber_tracker_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -519,6 +850,44 @@ export type Database = {
         }
         Relationships: []
       }
+      real_time_analytics: {
+        Row: {
+          barber_id: string | null
+          created_at: string
+          date_recorded: string
+          hour_recorded: number
+          id: string
+          metric_type: string
+          metric_value: number
+        }
+        Insert: {
+          barber_id?: string | null
+          created_at?: string
+          date_recorded?: string
+          hour_recorded?: number
+          id?: string
+          metric_type: string
+          metric_value: number
+        }
+        Update: {
+          barber_id?: string | null
+          created_at?: string
+          date_recorded?: string
+          hour_recorded?: number
+          id?: string
+          metric_type?: string
+          metric_value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "real_time_analytics_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barber_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       real_time_payments: {
         Row: {
           amount: number
@@ -636,6 +1005,38 @@ export type Database = {
           },
         ]
       }
+      typing_indicators: {
+        Row: {
+          conversation_id: string | null
+          id: string
+          is_typing: boolean
+          last_typed_at: string
+          user_id: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          id?: string
+          is_typing?: boolean
+          last_typed_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          id?: string
+          is_typing?: boolean
+          last_typed_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "typing_indicators_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           avatar_url: string | null
@@ -733,21 +1134,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -765,14 +1170,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -788,14 +1195,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -811,14 +1220,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -826,14 +1237,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
