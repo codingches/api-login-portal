@@ -9,6 +9,7 @@ import { BookingsTab } from "./BookingsTab";
 import { ProfileTab } from "./ProfileTab";
 import { ReviewList } from "@/components/reviews/ReviewList";
 import { PhotoGallery } from "@/components/gallery/PhotoGallery";
+import { RealTimeDashboard } from "@/components/realtime/RealTimeDashboard";
 
 interface DashboardTabsProps {
   barberProfile: any;
@@ -38,6 +39,9 @@ export const DashboardTabs = ({
       <TabsList className="bg-black border border-green-500/30">
         <TabsTrigger value="overview" className="data-[state=active]:bg-green-500/20">
           Overview
+        </TabsTrigger>
+        <TabsTrigger value="realtime" className="data-[state=active]:bg-green-500/20">
+          🔴 Live
         </TabsTrigger>
         <TabsTrigger value="profile" className="data-[state=active]:bg-green-500/20">
           Profile
@@ -70,6 +74,13 @@ export const DashboardTabs = ({
           barberProfile={barberProfile}
           bookings={bookings}
           services={services}
+        />
+      </TabsContent>
+
+      <TabsContent value="realtime">
+        <RealTimeDashboard 
+          barberId={barberProfile.id}
+          isBarber={true}
         />
       </TabsContent>
 
